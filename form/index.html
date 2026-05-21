@@ -1,0 +1,1478 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Form Validation System</title>
+    <style>
+      /*
+        Form Validation System (Micro Project)
+        - Single HTML file
+        - Internal CSS + JavaScript
+        - Premium glassmorphism UI + animations
+      */
+
+      :root {
+        --bg1: #0ea5e9;
+        --bg2: #6366f1;
+        --bg3: #22c55e;
+        --text: #0b1220;
+        --muted: rgba(15, 23, 42, 0.72);
+        --border: rgba(15, 23, 42, 0.14);
+        --focus: rgba(99, 102, 241, 0.38);
+        --glass: rgba(255, 255, 255, 0.22);
+        --glass-2: rgba(255, 255, 255, 0.14);
+        --card: rgba(255, 255, 255, 0.42);
+        --danger: #ef4444;
+        --success: #16a34a;
+        --shadow: 0 20px 55px rgba(2, 6, 23, 0.22);
+        --shadow-soft: 0 10px 28px rgba(2, 6, 23, 0.14);
+        --radius: 18px;
+        --ring: rgba(255, 255, 255, 0.35);
+        --accent1: #4f46e5;
+        --accent2: #0ea5e9;
+        --surface: rgba(255, 255, 255, 0.78);
+        --surface2: rgba(248, 250, 252, 0.9);
+        --inputBg: rgba(255, 255, 255, 0.7);
+        --icon: rgba(15, 23, 42, 0.6);
+        --transition: 220ms ease;
+      }
+
+      /* Dark theme overrides (toggled via JS) */
+      [data-theme="dark"] {
+        --text: rgba(248, 250, 252, 0.92);
+        --muted: rgba(226, 232, 240, 0.72);
+        --border: rgba(226, 232, 240, 0.16);
+        --focus: rgba(56, 189, 248, 0.32);
+        --glass: rgba(15, 23, 42, 0.35);
+        --glass-2: rgba(15, 23, 42, 0.22);
+        --card: rgba(15, 23, 42, 0.42);
+        --shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+        --shadow-soft: 0 12px 32px rgba(0, 0, 0, 0.28);
+        --ring: rgba(148, 163, 184, 0.28);
+        --surface: rgba(15, 23, 42, 0.78);
+        --surface2: rgba(2, 6, 23, 0.65);
+        --inputBg: rgba(2, 6, 23, 0.35);
+        --icon: rgba(226, 232, 240, 0.72);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family:
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          Segoe UI,
+          Roboto,
+          Helvetica,
+          Arial,
+          "Apple Color Emoji",
+          "Segoe UI Emoji";
+        color: var(--text);
+        background: linear-gradient(120deg, var(--bg1), var(--bg2), var(--bg3));
+        background-size: 200% 200%;
+        animation: gradientMove 12s ease infinite;
+        display: grid;
+        place-items: center;
+        padding: 24px;
+        transition:
+          color var(--transition),
+          background-color var(--transition);
+        overflow-x: hidden;
+      }
+
+      @keyframes gradientMove {
+        0% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+        100% {
+          background-position: 0% 50%;
+        }
+      }
+
+      .container {
+        width: 100%;
+        max-width: 640px;
+        animation: pageIn 520ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+      }
+
+      @keyframes pageIn {
+        from {
+          opacity: 0;
+          transform: translateY(14px) scale(0.99);
+          filter: blur(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+          filter: blur(0);
+        }
+      }
+
+      .card {
+        position: relative;
+        background: linear-gradient(180deg, var(--glass), var(--glass-2));
+        border: 1px solid var(--ring);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 26px 26px 22px;
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        overflow: hidden;
+      }
+
+      /* Glowing border effect */
+      .card::before {
+        content: "";
+        position: absolute;
+        inset: -2px;
+        border-radius: calc(var(--radius) + 2px);
+        background: radial-gradient(
+          700px 220px at 25% 0%,
+          rgba(14, 165, 233, 0.4),
+          rgba(99, 102, 241, 0.22),
+          transparent 60%
+        );
+        opacity: 0.9;
+        pointer-events: none;
+        filter: blur(10px);
+      }
+
+      .card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: var(--radius);
+        background: radial-gradient(800px 340px at 80% 20%, rgba(34, 197, 94, 0.18), transparent 55%);
+        pointer-events: none;
+      }
+
+      .cardHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .headerLeft {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        min-width: 0;
+      }
+
+      .avatar {
+        width: 46px;
+        height: 46px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0.15));
+        border: 1px solid var(--ring);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .avatar svg {
+        width: 24px;
+        height: 24px;
+        opacity: 0.9;
+      }
+
+      .titleBlock {
+        min-width: 0;
+      }
+
+      .cardHeader h2 {
+        margin: 0;
+        font-size: 20px;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+      }
+
+      .hint {
+        margin: 0;
+        color: var(--muted);
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      form {
+        display: grid;
+        gap: 14px;
+        margin-top: 14px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .topBar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid var(--ring);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .progressWrap {
+        display: grid;
+        gap: 6px;
+        width: 100%;
+      }
+
+      .progressTop {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12.5px;
+        color: var(--muted);
+      }
+
+      .progressBar {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        overflow: hidden;
+      }
+
+      [data-theme="dark"] .progressBar {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .progressFill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background: linear-gradient(90deg, rgba(79, 70, 229, 1), rgba(14, 165, 233, 1), rgba(34, 197, 94, 1));
+        transition: width 260ms ease;
+      }
+
+      .themeToggle {
+        flex: 0 0 auto;
+        width: 44px;
+        height: 28px;
+        border-radius: 999px;
+        border: 1px solid var(--ring);
+        background: rgba(255, 255, 255, 0.12);
+        position: relative;
+        cursor: pointer;
+        transition:
+          transform var(--transition),
+          background var(--transition),
+          border-color var(--transition);
+        box-shadow: var(--shadow-soft);
+      }
+
+      .themeToggle:hover {
+        transform: translateY(-1px);
+      }
+
+      .themeToggle:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 4px var(--focus), var(--shadow-soft);
+      }
+
+      .themeKnob {
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
+        border: 1px solid rgba(15, 23, 42, 0.12);
+        position: absolute;
+        top: 50%;
+        left: 3px;
+        transform: translateY(-50%);
+        transition: left var(--transition);
+      }
+
+      [data-theme="dark"] .themeKnob {
+        left: 19px;
+        background: linear-gradient(135deg, rgba(226, 232, 240, 0.95), rgba(148, 163, 184, 0.5));
+        border-color: rgba(226, 232, 240, 0.18);
+      }
+
+      .row {
+        display: grid;
+        gap: 10px;
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .field {
+        display: grid;
+      }
+
+      .control {
+        position: relative;
+        display: grid;
+      }
+
+      input {
+        width: 100%;
+        padding: 14px 14px 14px 44px;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        outline: none;
+        background: var(--inputBg);
+        color: var(--text);
+        transition:
+          border-color var(--transition),
+          box-shadow var(--transition),
+          transform var(--transition),
+          background var(--transition);
+      }
+
+      input:hover {
+        border-color: rgba(99, 102, 241, 0.35);
+      }
+
+      input:focus {
+        border-color: rgba(99, 102, 241, 0.7);
+        box-shadow: 0 0 0 4px var(--focus);
+        transform: translateY(-1px);
+      }
+
+      input.invalid {
+        border-color: rgba(239, 68, 68, 0.9);
+        box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.16);
+      }
+
+      /* Shake animation for invalid inputs */
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        20% {
+          transform: translateX(-6px);
+        }
+        40% {
+          transform: translateX(6px);
+        }
+        60% {
+          transform: translateX(-4px);
+        }
+        80% {
+          transform: translateX(4px);
+        }
+      }
+
+      input.shake {
+        animation: shake 360ms ease;
+      }
+
+      /* Floating label (label placed after input inside .control) */
+      .floatLabel {
+        position: absolute;
+        left: 44px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-weight: 700;
+        font-size: 13px;
+        color: rgba(15, 23, 42, 0.55);
+        padding: 0 8px;
+        border-radius: 999px;
+        pointer-events: none;
+        transition:
+          top var(--transition),
+          transform var(--transition),
+          font-size var(--transition),
+          color var(--transition),
+          background var(--transition);
+        background: transparent;
+      }
+
+      [data-theme="dark"] .floatLabel {
+        color: rgba(226, 232, 240, 0.62);
+      }
+
+      input:not(:placeholder-shown) + .floatLabel,
+      input:focus + .floatLabel {
+        top: 0;
+        transform: translateY(-55%);
+        font-size: 12px;
+        color: var(--muted);
+        background: rgba(255, 255, 255, 0.16);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      [data-theme="dark"] input:not(:placeholder-shown) + .floatLabel,
+      [data-theme="dark"] input:focus + .floatLabel {
+        background: rgba(2, 6, 23, 0.28);
+        border-color: rgba(226, 232, 240, 0.14);
+      }
+
+      .icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 18px;
+        height: 18px;
+        color: var(--icon);
+        opacity: 0.95;
+        pointer-events: none;
+      }
+
+      .icon svg {
+        width: 18px;
+        height: 18px;
+        display: block;
+      }
+
+      .error {
+        min-height: 18px;
+        margin-top: 6px;
+        font-size: 12.5px;
+        color: var(--danger);
+      }
+
+      .toggleBtn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--text);
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 7px 10px;
+        cursor: pointer;
+        transition:
+          transform var(--transition),
+          background var(--transition),
+          border-color var(--transition),
+          box-shadow var(--transition);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+      }
+
+      .toggleBtn:hover {
+        background: rgba(255, 255, 255, 0.18);
+        border-color: rgba(99, 102, 241, 0.35);
+        transform: translateY(-50%) scale(1.02);
+      }
+
+      .toggleBtn:active {
+        transform: translateY(-50%) scale(0.98);
+      }
+
+      /* Add extra right padding for password inputs (space for toggle button) */
+      input.hasToggle {
+        padding-right: 92px;
+      }
+
+      .actions {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 6px;
+      }
+
+      button[type="submit"] {
+        border: none;
+        border-radius: 16px;
+        padding: 12px 14px;
+        background: linear-gradient(135deg, var(--accent1), var(--accent2));
+        color: #ffffff;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 10px 22px rgba(79, 70, 229, 0.25);
+        transition:
+          transform var(--transition),
+          box-shadow var(--transition),
+          filter var(--transition),
+          opacity var(--transition);
+        width: 100%;
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.01em;
+      }
+
+      button[type="submit"]:hover {
+        filter: brightness(1.02);
+        transform: translateY(-1px);
+        box-shadow: 0 14px 28px rgba(79, 70, 229, 0.28);
+      }
+
+      button[type="submit"]:active {
+        transform: translateY(0);
+      }
+
+      button[type="submit"]:disabled {
+        opacity: 0.55;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+      }
+
+      .btnInner {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .spinner {
+        width: 16px;
+        height: 16px;
+        border-radius: 999px;
+        border: 2px solid rgba(255, 255, 255, 0.35);
+        border-top-color: rgba(255, 255, 255, 0.95);
+        display: none;
+        animation: spin 0.9s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      button.loading .spinner {
+        display: inline-block;
+      }
+
+      .status {
+        display: none;
+        margin-top: 14px;
+        border-radius: 16px;
+        padding: 12px 14px;
+        border: 1px solid rgba(22, 163, 74, 0.25);
+        background: rgba(22, 163, 74, 0.08);
+        color: #0f5132;
+        font-weight: 700;
+      }
+
+      .status.show {
+        display: block;
+      }
+
+      .footerNote {
+        margin-top: 12px;
+        color: var(--muted);
+        font-size: 12.5px;
+        line-height: 1.5;
+      }
+
+      .strength {
+        margin-top: 10px;
+        padding: 10px 12px;
+        border-radius: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .strengthTop {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        font-size: 12.5px;
+        color: var(--muted);
+        margin-bottom: 8px;
+      }
+
+      .meter {
+        height: 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        overflow: hidden;
+      }
+
+      [data-theme="dark"] .meter {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .meterFill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        transition: width 240ms ease, background 240ms ease;
+        background: rgba(239, 68, 68, 0.95);
+      }
+
+      .strengthMsg {
+        margin-top: 8px;
+        font-size: 12.5px;
+        color: var(--muted);
+        line-height: 1.4;
+      }
+
+      /* Modal */
+      .modalOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(2, 6, 23, 0.55);
+        display: none;
+        place-items: center;
+        padding: 18px;
+        z-index: 50;
+      }
+
+      .modalOverlay.show {
+        display: grid;
+        animation: fadeIn 180ms ease both;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      .modal {
+        width: 100%;
+        max-width: 520px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, var(--surface), var(--surface2));
+        border: 1px solid rgba(255, 255, 255, 0.22);
+        box-shadow: var(--shadow);
+        padding: 18px;
+        position: relative;
+        overflow: hidden;
+        transform: translateY(8px) scale(0.99);
+        animation: modalIn 240ms cubic-bezier(0.2, 0.9, 0.2, 1) both;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+
+      @keyframes modalIn {
+        to {
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      .modalHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .closeBtn {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.12);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 8px 10px;
+        cursor: pointer;
+        transition: transform var(--transition), border-color var(--transition), background var(--transition);
+      }
+
+      .closeBtn:hover {
+        transform: translateY(-1px);
+        border-color: rgba(99, 102, 241, 0.35);
+        background: rgba(255, 255, 255, 0.18);
+      }
+
+      .successIcon {
+        width: 54px;
+        height: 54px;
+        border-radius: 999px;
+        display: grid;
+        place-items: center;
+        background: rgba(22, 163, 74, 0.12);
+        border: 1px solid rgba(22, 163, 74, 0.24);
+        margin-bottom: 10px;
+      }
+
+      .check {
+        width: 26px;
+        height: 16px;
+        border-left: 4px solid rgba(22, 163, 74, 0.95);
+        border-bottom: 4px solid rgba(22, 163, 74, 0.95);
+        transform: rotate(-45deg);
+        animation: popCheck 320ms ease both;
+      }
+
+      @keyframes popCheck {
+        from {
+          transform: rotate(-45deg) scale(0.7);
+          opacity: 0.2;
+        }
+        to {
+          transform: rotate(-45deg) scale(1);
+          opacity: 1;
+        }
+      }
+
+      .modalBody h3 {
+        margin: 0 0 6px;
+        letter-spacing: -0.02em;
+      }
+
+      .modalBody p {
+        margin: 0;
+        color: var(--muted);
+        line-height: 1.55;
+      }
+
+      .modalActions {
+        margin-top: 14px;
+        display: grid;
+        gap: 10px;
+      }
+
+      .primaryBtn {
+        border: none;
+        border-radius: 16px;
+        padding: 12px 14px;
+        background: linear-gradient(135deg, rgba(22, 163, 74, 0.95), rgba(14, 165, 233, 0.95));
+        color: #ffffff;
+        font-weight: 900;
+        cursor: pointer;
+        transition: transform var(--transition), box-shadow var(--transition), filter var(--transition);
+        box-shadow: 0 14px 30px rgba(22, 163, 74, 0.2);
+      }
+
+      .primaryBtn:hover {
+        transform: translateY(-1px);
+        filter: brightness(1.02);
+      }
+
+      @media (max-width: 520px) {
+        .card {
+          padding: 20px;
+        }
+
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="container" aria-label="Form Validation System">
+      <section class="card" aria-label="Registration form card">
+        <header class="cardHeader">
+          <div class="headerLeft">
+            <div class="avatar" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Z"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                />
+                <path
+                  d="M4.5 20c1.8-3.6 5-5.2 7.5-5.2S17.7 16.4 19.5 20"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </div>
+            <div class="titleBlock">
+              <h2>Register</h2>
+              <p class="hint">Premium UI • Real-time validation • Secure-looking flow</p>
+            </div>
+          </div>
+        </header>
+
+        <form id="registrationForm" novalidate>
+          <!-- Progress + Theme Toggle -->
+          <div class="topBar">
+            <div class="progressWrap" aria-label="Form completion progress">
+              <div class="progressTop">
+                <span>Completion</span>
+                <strong id="progressText">0%</strong>
+              </div>
+              <div class="progressBar" aria-hidden="true">
+                <div class="progressFill" id="progressFill"></div>
+              </div>
+            </div>
+            <button
+              class="themeToggle"
+              id="themeToggle"
+              type="button"
+              aria-label="Toggle dark or light mode"
+              aria-pressed="false"
+              title="Toggle theme"
+            >
+              <span class="themeKnob" aria-hidden="true"></span>
+            </button>
+          </div>
+
+          <!-- Full Name -->
+          <div class="field">
+            <div class="control">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M12 12a4.5 4.5 0 1 0-4.5-4.5A4.5 4.5 0 0 0 12 12Z"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  />
+                  <path
+                    d="M4.5 20c1.8-3.6 5-5.2 7.5-5.2S17.7 16.4 19.5 20"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+              <input
+                id="fullName"
+                name="fullName"
+                type="text"
+                autocomplete="name"
+                placeholder=" "
+                aria-describedby="fullNameError"
+              />
+              <label class="floatLabel" for="fullName">Full Name</label>
+            </div>
+            <div class="error" id="fullNameError" aria-live="polite"></div>
+          </div>
+
+          <!-- Email -->
+          <div class="field">
+            <div class="control">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4.5 7.5h15v9h-15v-9Z"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linejoin="round"
+                  />
+                  <path
+                    d="M5 8l7 6 7-6"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </span>
+              <input
+                id="email"
+                name="email"
+                type="email"
+                autocomplete="email"
+                placeholder=" "
+                aria-describedby="emailError"
+              />
+              <label class="floatLabel" for="email">Email</label>
+            </div>
+            <div class="error" id="emailError" aria-live="polite"></div>
+          </div>
+
+          <!-- Password + Confirm Password -->
+          <div class="row">
+            <div class="field">
+              <div class="control">
+                <span class="icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M7.5 11V8.5a4.5 4.5 0 0 1 9 0V11"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M6 11h12v9H6v-9Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+                <input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder=" "
+                  class="hasToggle"
+                  aria-describedby="passwordStrength passwordError"
+                />
+                <label class="floatLabel" for="password">Password</label>
+                <button type="button" class="toggleBtn" id="togglePassword" aria-label="Show password">
+                  Show
+                </button>
+              </div>
+              <div class="strength" id="passwordStrength" aria-live="polite">
+                <div class="strengthTop">
+                  <span>Password strength</span>
+                  <strong id="strengthLabel">Weak</strong>
+                </div>
+                <div class="meter" aria-hidden="true">
+                  <div class="meterFill" id="strengthFill"></div>
+                </div>
+                <div class="strengthMsg" id="strengthMsg">
+                  Use uppercase, lowercase, number, and special character. No spaces.
+                </div>
+              </div>
+              <div class="error" id="passwordError" aria-live="polite"></div>
+            </div>
+
+            <div class="field">
+              <div class="control">
+                <span class="icon" aria-hidden="true">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M7.5 11V8.5a4.5 4.5 0 0 1 9 0V11"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                    />
+                    <path
+                      d="M6 11h12v9H6v-9Z"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M9 15.5l2 2 4-5"
+                      stroke="currentColor"
+                      stroke-width="1.8"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </span>
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  autocomplete="new-password"
+                  placeholder=" "
+                  class="hasToggle"
+                  aria-describedby="confirmPasswordError"
+                />
+                <label class="floatLabel" for="confirmPassword">Confirm Password</label>
+                <button type="button" class="toggleBtn" id="toggleConfirmPassword" aria-label="Show confirm password">
+                  Show
+                </button>
+              </div>
+              <div class="error" id="confirmPasswordError" aria-live="polite"></div>
+            </div>
+          </div>
+
+          <!-- Phone Number -->
+          <div class="field">
+            <div class="control">
+              <span class="icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M8 3.8h8A2.2 2.2 0 0 1 18.2 6v12A2.2 2.2 0 0 1 16 20.2H8A2.2 2.2 0 0 1 5.8 18V6A2.2 2.2 0 0 1 8 3.8Z"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                  />
+                  <path
+                    d="M10 17h4"
+                    stroke="currentColor"
+                    stroke-width="1.8"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </span>
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputmode="numeric"
+                autocomplete="tel"
+                placeholder=" "
+                maxlength="10"
+                aria-describedby="phoneError"
+              />
+              <label class="floatLabel" for="phone">Phone Number</label>
+            </div>
+            <div class="error" id="phoneError" aria-live="polite"></div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" id="submitBtn" disabled>
+              <span class="btnInner">
+                <span id="submitText">Submit Registration</span>
+                <span class="spinner" aria-hidden="true"></span>
+              </span>
+            </button>
+          </div>
+
+          <div class="status" id="successMessage" role="status" aria-live="polite">
+            Success! Your registration form is valid.
+          </div>
+
+          <div class="footerNote">
+            Tip: Your progress, theme, and form data are saved automatically.
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <!-- Success Popup Modal -->
+    <div class="modalOverlay" id="successModalOverlay" aria-hidden="true">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="successTitle" aria-describedby="successDesc">
+        <div class="modalHeader">
+          <div style="display: flex; align-items: center; gap: 12px">
+            <div class="successIcon" aria-hidden="true"><div class="check"></div></div>
+            <div class="modalBody">
+              <h3 id="successTitle">Registration Successful</h3>
+              <p id="successDesc">
+                Welcome, <strong id="successName">User</strong>. Your form passed all validations.
+              </p>
+            </div>
+          </div>
+          <button class="closeBtn" type="button" id="closeModalBtn" aria-label="Close success popup">Close</button>
+        </div>
+        <div class="modalActions">
+          <button class="primaryBtn" type="button" id="modalOkBtn">OK</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /*
+        Validation rules:
+        - All fields required
+        - Email must be valid format
+        - Password must be at least 6 characters
+        - Confirm password must match password
+        - Phone number must be exactly 10 digits
+
+        Extra features:
+        - Real-time validation
+        - Show/Hide password
+        - Submit disabled until all valid
+
+        Upgrades:
+        - Dark/Light mode toggle (saved)
+        - Password strength meter
+        - Loading spinner + fake submit delay
+        - Success modal popup showing entered name
+        - Auto save + restore form data
+        - Progress indicator
+      */
+
+      const form = document.getElementById("registrationForm");
+
+      const fullName = document.getElementById("fullName");
+      const email = document.getElementById("email");
+      const password = document.getElementById("password");
+      const confirmPassword = document.getElementById("confirmPassword");
+      const phone = document.getElementById("phone");
+
+      const submitBtn = document.getElementById("submitBtn");
+      const successMessage = document.getElementById("successMessage");
+      const submitText = document.getElementById("submitText");
+
+      const progressText = document.getElementById("progressText");
+      const progressFill = document.getElementById("progressFill");
+
+      const strengthLabel = document.getElementById("strengthLabel");
+      const strengthFill = document.getElementById("strengthFill");
+      const strengthMsg = document.getElementById("strengthMsg");
+
+      const themeToggle = document.getElementById("themeToggle");
+      const successModalOverlay = document.getElementById("successModalOverlay");
+      const closeModalBtn = document.getElementById("closeModalBtn");
+      const modalOkBtn = document.getElementById("modalOkBtn");
+      const successName = document.getElementById("successName");
+
+      const togglePassword = document.getElementById("togglePassword");
+      const toggleConfirmPassword = document.getElementById("toggleConfirmPassword");
+
+      const STORAGE_KEY = "formValidationSystem:v1";
+
+      // Error message elements
+      const errors = {
+        fullName: document.getElementById("fullNameError"),
+        email: document.getElementById("emailError"),
+        password: document.getElementById("passwordError"),
+        confirmPassword: document.getElementById("confirmPasswordError"),
+        phone: document.getElementById("phoneError"),
+      };
+
+      // Simple (beginner-friendly) email regex
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+      function setFieldState(inputEl, errorEl, message) {
+        // message: empty string means valid
+        if (message) {
+          inputEl.classList.add("invalid");
+          errorEl.textContent = message;
+          inputEl.setAttribute("aria-invalid", "true");
+          return false;
+        }
+
+        inputEl.classList.remove("invalid");
+        errorEl.textContent = "";
+        inputEl.setAttribute("aria-invalid", "false");
+        return true;
+      }
+
+      function getEmailSuggestion(value) {
+        // Very simple suggestions for beginner demo
+        const trimmed = value.trim();
+        if (!trimmed) return "";
+
+        // If user typed something like "name@" suggest common domain
+        if (trimmed.endsWith("@")) return `${trimmed}gmail.com`;
+
+        // If user typed "name" without @, suggest full email
+        if (!trimmed.includes("@")) return `${trimmed}@gmail.com`;
+
+        // If user typed "name@gm" suggest "name@gmail.com"
+        const [local, domain = ""] = trimmed.split("@");
+        if (local && domain && "gmail.com".startsWith(domain)) return `${local}@gmail.com`;
+        if (local && domain && "yahoo.com".startsWith(domain)) return `${local}@yahoo.com`;
+        if (local && domain && "outlook.com".startsWith(domain)) return `${local}@outlook.com`;
+
+        return "";
+      }
+
+      function normalizeFullName(value) {
+        return value.replace(/\s+/g, " ").trim();
+      }
+
+      function validateFullName() {
+        const value = normalizeFullName(fullName.value);
+        if (fullName.value !== value) fullName.value = value;
+
+        if (!value) return setFieldState(fullName, errors.fullName, "Full name is required.");
+        if (value.length < 3) return setFieldState(fullName, errors.fullName, "Full name must be at least 3 characters.");
+
+        // Letters + spaces only (micro-project requirement)
+        const lettersOnly = /^[A-Za-z ]+$/;
+        if (!lettersOnly.test(value)) {
+          return setFieldState(fullName, errors.fullName, "Full name must contain only letters and spaces.");
+        }
+
+        return setFieldState(fullName, errors.fullName, "");
+      }
+
+      function validateEmail() {
+        const value = email.value.trim();
+        if (!value) return setFieldState(email, errors.email, "Email is required.");
+        if (!emailRegex.test(value)) {
+          const suggestion = getEmailSuggestion(value);
+          const msg = suggestion
+            ? `Invalid email. Try: ${suggestion}`
+            : "Please enter a valid email address (example: name@gmail.com).";
+          return setFieldState(email, errors.email, msg);
+        }
+        return setFieldState(email, errors.email, "");
+      }
+
+      function scorePassword(pwd) {
+        // Rule-based score (0..4)
+        const hasLower = /[a-z]/.test(pwd);
+        const hasUpper = /[A-Z]/.test(pwd);
+        const hasNumber = /[0-9]/.test(pwd);
+        const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+        return [hasLower, hasUpper, hasNumber, hasSpecial].filter(Boolean).length;
+      }
+
+      function updateStrengthUI() {
+        const pwd = password.value;
+        const noSpaces = !/\s/.test(pwd);
+        const lenOk = pwd.length >= 6;
+        const score = scorePassword(pwd);
+
+        // Progress and labels:
+        // - Weak: 0-1
+        // - Medium: 2-3
+        // - Strong: 4 and length ok and no spaces
+        let label = "Weak";
+        let fill = 22;
+        let color = "rgba(239, 68, 68, 0.95)";
+        let message = "Use uppercase, lowercase, number, and special character. No spaces.";
+
+        if (pwd.length === 0) {
+          label = "Weak";
+          fill = 0;
+          message = "Start typing a password to see strength.";
+        } else if (score >= 2) {
+          label = "Medium";
+          fill = 60;
+          color = "rgba(245, 158, 11, 0.95)";
+          message = "Good start. Add missing character types to make it strong.";
+        }
+
+        if (score === 4 && lenOk && noSpaces) {
+          label = "Strong";
+          fill = 100;
+          color = "rgba(22, 163, 74, 0.95)";
+          message = "Strong password. Nice!";
+        }
+
+        if (!noSpaces) {
+          label = "Weak";
+          fill = Math.min(fill, 30);
+          color = "rgba(239, 68, 68, 0.95)";
+          message = "Spaces are not allowed in the password.";
+        }
+
+        strengthLabel.textContent = label;
+        strengthFill.style.width = `${fill}%`;
+        strengthFill.style.background = color;
+        strengthMsg.textContent = message;
+      }
+
+      function validatePassword() {
+        // Prevent spaces in password (auto-remove)
+        const cleaned = password.value.replace(/\s+/g, "");
+        if (password.value !== cleaned) password.value = cleaned;
+
+        const value = password.value;
+        if (!value) return setFieldState(password, errors.password, "Password is required.");
+        if (value.length < 6) return setFieldState(password, errors.password, "Password must be at least 6 characters.");
+
+        // Must contain: 1 uppercase, 1 lowercase, 1 number, 1 special character
+        const hasLower = /[a-z]/.test(value);
+        const hasUpper = /[A-Z]/.test(value);
+        const hasNumber = /[0-9]/.test(value);
+        const hasSpecial = /[^A-Za-z0-9]/.test(value);
+
+        if (!(hasLower && hasUpper && hasNumber && hasSpecial)) {
+          return setFieldState(
+            password,
+            errors.password,
+            "Password must include uppercase, lowercase, number, and special character.",
+          );
+        }
+
+        return setFieldState(password, errors.password, "");
+      }
+
+      function validateConfirmPassword() {
+        const value = confirmPassword.value;
+        if (!value) return setFieldState(confirmPassword, errors.confirmPassword, "Confirm password is required.");
+        if (value !== password.value) return setFieldState(confirmPassword, errors.confirmPassword, "Passwords do not match.");
+        return setFieldState(confirmPassword, errors.confirmPassword, "");
+      }
+
+      function validatePhone() {
+        // Keep only digits (helps beginner UX)
+        const digitsOnly = phone.value.replace(/\D/g, "");
+        if (phone.value !== digitsOnly) phone.value = digitsOnly;
+
+        if (!digitsOnly) return setFieldState(phone, errors.phone, "Phone number is required.");
+        if (digitsOnly.length !== 10) return setFieldState(phone, errors.phone, "Phone number must be exactly 10 digits.");
+        return setFieldState(phone, errors.phone, "");
+      }
+
+      function updateProgress(validMap) {
+        const fields = ["fullName", "email", "password", "confirmPassword", "phone"];
+        const okCount = fields.filter((k) => validMap[k]).length;
+        const percent = Math.round((okCount / fields.length) * 100);
+
+        progressText.textContent = `${percent}%`;
+        progressFill.style.width = `${percent}%`;
+      }
+
+      function validateAll() {
+        const okName = validateFullName();
+        const okEmail = validateEmail();
+        const okPass = validatePassword();
+        const okConfirm = validateConfirmPassword();
+        const okPhone = validatePhone();
+
+        const allValid = okName && okEmail && okPass && okConfirm && okPhone;
+
+        submitBtn.disabled = !allValid;
+        if (!allValid) successMessage.classList.remove("show");
+
+        updateProgress({
+          fullName: okName,
+          email: okEmail,
+          password: okPass,
+          confirmPassword: okConfirm,
+          phone: okPhone,
+        });
+
+        return allValid;
+      }
+
+      function togglePasswordVisibility(inputEl, toggleBtn) {
+        const isPassword = inputEl.type === "password";
+        inputEl.type = isPassword ? "text" : "password";
+        toggleBtn.textContent = isPassword ? "Hide" : "Show";
+        toggleBtn.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+      }
+
+      function saveToStorage() {
+        // Note: For real apps, avoid storing passwords in localStorage.
+        const data = {
+          fullName: fullName.value,
+          email: email.value,
+          password: password.value,
+          confirmPassword: confirmPassword.value,
+          phone: phone.value,
+          theme: document.documentElement.getAttribute("data-theme") || "light",
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+      }
+
+      function restoreFromStorage() {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) {
+          // Default theme: follow system preference on first load
+          const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+          document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light");
+          themeToggle.setAttribute("aria-pressed", prefersDark ? "true" : "false");
+          return;
+        }
+        try {
+          const data = JSON.parse(raw);
+          if (typeof data.fullName === "string") fullName.value = data.fullName;
+          if (typeof data.email === "string") email.value = data.email;
+          if (typeof data.password === "string") password.value = data.password;
+          if (typeof data.confirmPassword === "string") confirmPassword.value = data.confirmPassword;
+          if (typeof data.phone === "string") phone.value = data.phone;
+
+          if (data.theme === "dark" || data.theme === "light") {
+            document.documentElement.setAttribute("data-theme", data.theme);
+            themeToggle.setAttribute("aria-pressed", data.theme === "dark" ? "true" : "false");
+          }
+        } catch {
+          // If storage is corrupted, ignore it.
+        }
+      }
+
+      function setTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        themeToggle.setAttribute("aria-pressed", theme === "dark" ? "true" : "false");
+        saveToStorage();
+      }
+
+      function openSuccessModal() {
+        successModalOverlay.classList.add("show");
+        successModalOverlay.setAttribute("aria-hidden", "false");
+        closeModalBtn.focus();
+      }
+
+      function closeSuccessModal() {
+        successModalOverlay.classList.remove("show");
+        successModalOverlay.setAttribute("aria-hidden", "true");
+        submitBtn.focus();
+      }
+
+      // Real-time validation on input events
+      fullName.addEventListener("input", () => {
+        validateAll();
+        saveToStorage();
+      });
+      email.addEventListener("input", () => {
+        validateAll();
+        saveToStorage();
+      });
+      password.addEventListener("input", () => {
+        updateStrengthUI();
+        validateAll();
+        saveToStorage();
+      });
+      confirmPassword.addEventListener("input", () => {
+        validateAll();
+        saveToStorage();
+      });
+      phone.addEventListener("input", () => {
+        validateAll();
+        saveToStorage();
+      });
+
+      // Show/Hide toggles
+      togglePassword.addEventListener("click", () => togglePasswordVisibility(password, togglePassword));
+      toggleConfirmPassword.addEventListener("click", () =>
+        togglePasswordVisibility(confirmPassword, toggleConfirmPassword),
+      );
+
+      // Theme toggle
+      themeToggle.addEventListener("click", () => {
+        const current = document.documentElement.getAttribute("data-theme") || "light";
+        setTheme(current === "dark" ? "light" : "dark");
+      });
+
+      // Modal close actions
+      closeModalBtn.addEventListener("click", closeSuccessModal);
+      modalOkBtn.addEventListener("click", closeSuccessModal);
+      successModalOverlay.addEventListener("click", (e) => {
+        if (e.target === successModalOverlay) closeSuccessModal();
+      });
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && successModalOverlay.classList.contains("show")) closeSuccessModal();
+      });
+
+      function shakeInvalidFields() {
+        const fields = [fullName, email, password, confirmPassword, phone];
+        fields.forEach((el) => {
+          if (el.classList.contains("invalid")) {
+            el.classList.remove("shake");
+            // Restart animation
+            void el.offsetWidth;
+            el.classList.add("shake");
+          }
+        });
+      }
+
+      // Submit handler
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const isValid = validateAll();
+        if (!isValid) {
+          shakeInvalidFields();
+          return;
+        }
+
+        // Loading effect + fake delay
+        submitBtn.classList.add("loading");
+        submitBtn.disabled = true;
+        submitText.textContent = "Submitting...";
+
+        setTimeout(() => {
+          submitBtn.classList.remove("loading");
+          submitText.textContent = "Submit Registration";
+
+          successMessage.classList.add("show");
+          successName.textContent = fullName.value.trim() || "User";
+          openSuccessModal();
+
+          // Reset the form after success (and clear storage)
+          setTimeout(() => {
+            form.reset();
+            updateStrengthUI();
+            successMessage.classList.remove("show");
+            validateAll();
+            password.type = "password";
+            confirmPassword.type = "password";
+            togglePassword.textContent = "Show";
+            toggleConfirmPassword.textContent = "Show";
+            localStorage.removeItem(STORAGE_KEY);
+          }, 500);
+        }, 2000);
+      });
+
+      // Initial state
+      restoreFromStorage();
+      updateStrengthUI();
+      validateAll();
+    </script>
+  </body>
+</html>

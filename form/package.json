@@ -1,0 +1,10 @@
+{
+  "name": "validation",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Form Validation System",
+  "scripts": {
+    "start": "npx --yes serve -l 8080 .",
+    "dev": "npm run start"
+  }
+}
